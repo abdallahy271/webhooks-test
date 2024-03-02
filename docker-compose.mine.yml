@@ -28,3 +28,23 @@ services:
       mongodb:
         condition: service_healthy
 
+  db:
+    image: postgis/postgis:14-3.3
+    container_name: pigeon_db_1
+    # accessible locally (localhost) on port 5433
+    ports:
+      - "5433:5432"
+    # Data persists across environment
+    volumes:
+      - /mnt/postgres/postgres_data/:/var/lib/postgresql/data/
+    env_file:
+      - ./.env/postgresql.env
+    # perform healthcheck to make sure postgis is accepting connections at endpoint
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U pigeon -d pigeon -h db -p 5432'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  
+ 
